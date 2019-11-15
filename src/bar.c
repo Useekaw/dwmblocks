@@ -87,6 +87,30 @@ static int bar_setup(bar_t *bar) {
     return 0;
 }
 
+static void bar_timerexpired(bar_t *bar) {
+    block_t *block = bar->blocks;
+
+    while (block) {
+        if (block->cfg->ival > 0) {
+           const unsigned long next_ts = block->ts + block->cfg->ival;
+           unsigned long now;
+           int err;
+
+           err = sys_gettime(&now);
+           if (err)
+               return;
+
+           if (((long)(next_ts - now)) <= 0) {
+               block_spawn(block);
+               block_touch(block);
+           }
+        }
+        block = block->next;
+    }
+
+    return;
+}
+
 static int bar_run(bar_t *bar) {
     int sig;
     int err;
@@ -102,6 +126,7 @@ static int bar_run(bar_t *bar) {
             break;
 
         if (sig == SIGALRM) {
+            bar_timerexpired(bar);
             continue;
         }
     }
@@ -118,6 +143,7 @@ int bar_init() {
     bar_setup(bar);
     bar_run(bar);
 
+    bar_start(bar);
     bar_destroy(bar);
 
     return 0;
