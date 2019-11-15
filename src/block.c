@@ -1,10 +1,10 @@
 #include "block.h"
 #include <stdlib.h>
 
-struct block *block_create(struct config *cfg, struct block *next) {
-    struct block *block;
+block_t *block_create(config_t *cfg, block_t *next) {
+    block_t *block;
 
-    block = calloc(1, sizeof(block));
+    block = (block_t *)calloc(1, sizeof(block_t));
     if (!block)
         return NULL;
 

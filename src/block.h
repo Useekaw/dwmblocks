@@ -1,11 +1,14 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
+typedef struct block block_t;
+typedef struct config config_t;
+
 struct block {
     // config
-    struct config *cfg;
+    config_t *cfg;
     // nav
-    struct block *next;
+    block_t *next;
 };
 
 struct config {

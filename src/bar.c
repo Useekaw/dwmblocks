@@ -8,8 +8,8 @@
 #include <signal.h>
 #include <time.h>
 
-static int bar_start(struct bar *bar) {
-    struct block *block;
+static int bar_start(bar_t *bar) {
+    block_t *block;
 
     block = bar->blocks;
     while (block) {
@@ -22,7 +22,7 @@ static int bar_start(struct bar *bar) {
 
 static bar_t *bar_create() {
     bar_t *bar;
-    struct block *block;
+    block_t *block;
     int i;
 
     bar = (bar_t *)calloc(1, sizeof(bar_t));
@@ -38,12 +38,12 @@ static bar_t *bar_create() {
     return bar;
 }
 
-static void bar_destroy(struct bar *bar) {
+static void bar_destroy(bar_t *bar) {
     free(bar);
 }
 
-static int bar_setup(struct bar *bar) {
-    struct block *block = bar->blocks;
+static int bar_setup(bar_t *bar) {
+    block_t *block = bar->blocks;
     sigset_t *set = &bar->sigset;
     timer_t *timerid = &bar->timerid;
     int err;
@@ -87,7 +87,7 @@ static int bar_setup(struct bar *bar) {
     return 0;
 }
 
-static int bar_run(struct bar *bar) {
+static int bar_run(bar_t *bar) {
     int sig;
     int err;
 
@@ -110,7 +110,7 @@ static int bar_run(struct bar *bar) {
 }
 
 int bar_init() {
-    struct bar *bar;
+    bar_t *bar;
     bar = bar_create();
     if (!bar)
         return -1;
