@@ -1,5 +1,6 @@
 # Ignore
 bin/
 obj/
+.ccls-cache/
 **/*.o
 **/dwmblock
