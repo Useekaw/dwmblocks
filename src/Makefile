@@ -14,7 +14,7 @@ LDLIBS = -lX11 -lrt
 
 CC = gcc
 
-SRC = bar.c block.c main.c
+SRC = bar.c block.c main.c sys.c
 COM =\
 	 blocks/datetime.c
 OBJ = ${SRC:.c=.o} ${COM:.c=.o}
