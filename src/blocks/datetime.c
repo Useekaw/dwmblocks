@@ -1,18 +1,18 @@
 #include<stdio.h>
 #include<time.h>
 
-static char buffer[80];
+// static char buffer[80];
 
-char *datetime(const char *fmt) {
+const int datetime(char *buffer, const char *fmt) {
     time_t t;
     struct tm *lt;
 
     time(&t);
     lt = localtime(&t);
 
-    if (!strftime(buffer, sizeof(buffer), "%H:%M", lt))
-        return NULL;
+    if (!strftime(buffer, sizeof(buffer), fmt, lt))
+        return -1;
 
-    return buffer;
+    return 0;
 }
     

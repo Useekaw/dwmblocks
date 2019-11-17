@@ -1,6 +1,9 @@
 #include "sys.h"
 #include <errno.h>
+#include <stdio.h>
+#include <sys/types.h>
 #include <time.h>
+#include <unistd.h>
 
 int sys_gettime(unsigned long *ival) {
     struct timespec ts;
@@ -50,6 +53,32 @@ int sys_settimer(timer_t *t, unsigned long ival) {
         return rc;
     }
     
+    return 0;
+}
+
+int sys_pipe(int *fds) {
+    int rc;
+
+    rc = pipe(fds);
+    if (rc == -1) {
+        // TODO: proper error handling
+        return rc;
+    }
+
+    return 0;
+}
+
+int sys_fork(pid_t *pid) {
+    int rc;
+
+    rc = fork();
+    if (rc == -1) {
+        // TODO: proper error handling
+        return rc;
+    }
+
+    *pid = rc;
+
     return 0;
 }
 

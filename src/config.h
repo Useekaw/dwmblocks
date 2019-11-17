@@ -5,7 +5,8 @@
 #include "blocks.h"
 
 struct config cfg[] = {
-    { datetime, "%s\n", "%H:%M", 1, 0 },
+    { datetime, "%s", "%d.%m.%Y", 5, 0 },
+    { datetime, "%s", "%H:%M", 5, 0 },
 };
 
 #endif

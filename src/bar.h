@@ -5,13 +5,12 @@
 #include <signal.h>
 #include <time.h>
 
-struct bar {
-    struct block *blocks;
+typedef struct bar {
+    char status[1024];
+    block_t *blocks;
     sigset_t sigset;
     timer_t timerid;
-};
-
-typedef struct bar bar_t;
+} bar_t;
 
 int bar_init();
 

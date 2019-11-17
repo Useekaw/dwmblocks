@@ -8,6 +8,10 @@ int sys_gettime(unsigned long *ival);
 
 int sys_createtimer(clockid_t clockid, timer_t *t, int sig);
 int sys_settimer(timer_t *t, unsigned long ival);
+
+int sys_pipe(int *fds);
+int sys_fork(pid_t *pid);
+
 int sys_sigemptyset(sigset_t *set);
 int sys_sigaddset(sigset_t *set, int sig);
 int sys_sigsetmask(sigset_t *set);

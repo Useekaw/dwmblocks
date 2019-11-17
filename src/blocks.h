@@ -1,6 +1,6 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
-const char *datetime(const char *fmt);
+const int datetime(char *buffer, const char *fmt);
 
 #endif

@@ -3,22 +3,16 @@
 #include "config.h"
 #include "util.h"
 #include "sys.h"
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <time.h>
+#include <X11/Xlib.h>
 
-static int bar_start(bar_t *bar) {
-    block_t *block;
-
-    block = bar->blocks;
-    while (block) {
-        printf(block->cfg->fmt, block->cfg->func(block->cfg->args));
-        block = block->next;
-    }
-
-    return 0;
-}
+static Display *dpy;
 
 static bar_t *bar_create() {
     bar_t *bar;
@@ -31,9 +25,11 @@ static bar_t *bar_create() {
 
     block = NULL;
     for (i = LEN(cfg) - 1; i >= 0; i--) {
-        block = block_create(&cfg[i], block);
+        block = block_create(bar, &cfg[i], block);
     }
     bar->blocks = block;
+
+    bar->status[0] = '\n';
 
     return bar;
 }
@@ -43,14 +39,9 @@ static void bar_destroy(bar_t *bar) {
 }
 
 static int bar_setup(bar_t *bar) {
-    block_t *block = bar->blocks;
     sigset_t *set = &bar->sigset;
     timer_t *timerid = &bar->timerid;
     int err;
-
-    while (block) {
-        block = block->next;
-    }
 
     err = sys_sigemptyset(set);
     if (err)
@@ -67,6 +58,11 @@ static int bar_setup(bar_t *bar) {
 
     // timer signal
     err = sys_sigaddset(set, SIGALRM);
+    if (err)
+        return err;
+
+    // child signal
+    err = sys_sigaddset(set, SIGCHLD);
     if (err)
         return err;
 
@@ -101,8 +97,7 @@ static void bar_timerexpired(bar_t *bar) {
                return;
 
            if (((long)(next_ts - now)) <= 0) {
-               block_spawn(block);
-               block_touch(block);
+               block_run(block);
            }
         }
         block = block->next;
@@ -111,11 +106,58 @@ static void bar_timerexpired(bar_t *bar) {
     return;
 }
 
+static void bar_childsignaled(bar_t *bar) {
+    int status;
+    pid_t pid;
+
+    block_t *block = bar->blocks;
+
+    while (block) {
+        if (block->pid > 0) {
+            pid = waitpid(block->pid, &status, WNOHANG);
+            if (pid == -1) {
+                printf("child process error\n");
+            } else if (pid == 0) {
+                printf("child process still running\n");
+            } else if (pid == block->pid) {
+                // printf("child process finished\n");
+                block_finish(block);
+            }
+        }
+        block = block->next;
+    }
+
+    return;
+}
+
+static void bar_draw(bar_t *bar) {
+    block_t *block = bar->blocks;
+    int len = 0;
+
+    while (block) {
+        len = snprintf(bar->status + len, 1024 - len, " %s", block->value);
+
+        block = block->next;
+    }
+
+    // TODO: proper error handling
+    XStoreName(dpy, DefaultRootWindow(dpy), bar->status);
+    XFlush(dpy);
+}
+
 static int bar_run(bar_t *bar) {
+    block_t *block = bar->blocks;
     int sig;
     int err;
 
+    while (block) {
+        block_run(block);
+        block = block->next;
+    }
+
     while (1) {
+        bar_draw(bar);
+
         err = sys_sigwaitinfo(&bar->sigset, &sig);
         if (err) {
             // TODO check for reasons not to break
@@ -129,6 +171,11 @@ static int bar_run(bar_t *bar) {
             bar_timerexpired(bar);
             continue;
         }
+
+        if (sig == SIGCHLD) {
+            bar_childsignaled(bar);
+            continue;
+        }
     }
 
     return 0;
@@ -136,6 +183,11 @@ static int bar_run(bar_t *bar) {
 
 int bar_init() {
     bar_t *bar;
+
+    dpy = XOpenDisplay(NULL);
+    if (!dpy)
+        return -1;
+
     bar = bar_create();
     if (!bar)
         return -1;
@@ -143,7 +195,7 @@ int bar_init() {
     bar_setup(bar);
     bar_run(bar);
 
-    bar_start(bar);
+    // bar_start(bar);
     bar_destroy(bar);
 
     return 0;
