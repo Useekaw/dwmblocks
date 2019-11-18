@@ -5,7 +5,9 @@
 #include "blocks.h"
 
 struct config cfg[] = {
-    { datetime, "%s", "%d.%m.%Y", 5, 0 },
+    { battery_perc, "BATT: %s ", "BAT0", 5, 0 },
+    { battery_remaining, "(%s) | ", "BAT0", 5, 0 },
+    { datetime, "%s | ", "%d.%m.%Y", 5, 0 },
     { datetime, "%s", "%H:%M", 5, 0 },
 };
 

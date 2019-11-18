@@ -135,7 +135,7 @@ static void bar_draw(bar_t *bar) {
     int len = 0;
 
     while (block) {
-        len = snprintf(bar->status + len, 1024 - len, " %s", block->value);
+        len += snprintf(bar->status + len, 1024 - len, block->cfg->fmt, block->value);
 
         block = block->next;
     }
