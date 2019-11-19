@@ -32,12 +32,11 @@ static bool battery_isdischarging(const char *bat) {
     return !strcmp(state, "Discharging");
 }
 
-static char icons[] = "";
-
 const int battery(char *buffer, const char *bat) {
     int len;
     int perc;
-    char *icon;
+    int res;
+    char *icon = "";
     uintmax_t charge_now;
     uintmax_t current_now;
     uintmax_t h;
@@ -45,8 +44,12 @@ const int battery(char *buffer, const char *bat) {
     double timeleft;
     bool discharging = battery_isdischarging(bat);
 
-    snprintf(path, PATH_MAX, PATH_CAPACITY, bat);
-    pscanf(path, "%d", &perc);
+    res = util_snprintf(path, PATH_MAX, PATH_CAPACITY, bat);
+    if (res == -1)
+        return -1;
+    
+    if (pscanf(path, "%d", &perc) != 1)
+        return -1;
 
     if (!discharging) {
         icon = "";
@@ -74,14 +77,23 @@ const int battery(char *buffer, const char *bat) {
         icon = "";
     }
 
-    len = snprintf(buffer, sizeof(buffer), "%s %d", icon, perc); 
+    res = util_snprintf(buffer, BUFFER_LEN, "%s %d%%", icon, perc); 
+    if (res == -1)
+        return -1;
+    len = res;
    
     if (discharging) {
-        snprintf(path, PATH_MAX, PATH_CHARGE, bat);
-        pscanf(path, "%ju", &charge_now);
+        res = util_snprintf(path, PATH_MAX, PATH_CHARGE, bat);
+        if (res == -1)
+            return -1;
+        if (pscanf(path, "%ju", &charge_now) != 1)
+            return -1;
 
-        snprintf(path, PATH_MAX, PATH_CURRENT, bat);
-        pscanf(path, "%ju", &current_now);
+        res = util_snprintf(path, PATH_MAX, PATH_CURRENT, bat);
+        if (res == -1)
+            return -1;
+        if (pscanf(path, "%ju", &current_now) != 1)
+            return -1;
 
         if (current_now == 0) {
             // TODO: really??
@@ -92,47 +104,10 @@ const int battery(char *buffer, const char *bat) {
         h = timeleft;
         m = (timeleft - (double)h) * 60;
 
-        len += snprintf(buffer + len, sizeof(buffer) - len, " (%ju:%ju)", h, m);
-    }
-
-    return 0;
-}
-const int battery_perc(char *buffer, const char *bat) {
-    int perc;
-
-    snprintf(path, PATH_MAX, PATH_CAPACITY, bat);
-    pscanf(path, "%d", &perc);
-    snprintf(buffer, sizeof(buffer), " %d", perc);
-
-    return 0;
-}
-
-const int battery_remaining(char *buffer, const char *bat) {
-    uintmax_t charge_now;
-    uintmax_t current_now;
-    uintmax_t h;
-    uintmax_t m;
-    double timeleft;
-
-    if (battery_isdischarging(bat)) {
-        snprintf(path, PATH_MAX, PATH_CHARGE, bat);
-        pscanf(path, "%ju", &charge_now);
-
-        snprintf(path, PATH_MAX, PATH_CURRENT, bat);
-        pscanf(path, "%ju", &current_now);
-
-        if (current_now == 0) {
-            // TODO: really??
+        res = util_snprintf(buffer + len, BUFFER_LEN - len, " (%ju:%02ju)", h, m);
+        if (res == -1)
             return -1;
-        }
-
-        timeleft = (double)charge_now / (double)current_now;
-        h = timeleft;
-        m = (timeleft - (double)h) * 60;
-
-        snprintf(buffer, sizeof(buffer), "%ju:%ju", h, m);
-    } else {
-        snprintf(buffer, sizeof(buffer), "%s", "");
+        len += res;
     }
 
     return 0;

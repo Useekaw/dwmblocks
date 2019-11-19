@@ -2,13 +2,14 @@
 #define BLOCK_H
 
 #include "bar.h"
+#include "util.h"
 #include <sys/types.h>
 
 typedef struct block {
     // runtime info
     unsigned long ts;
     pid_t pid;
-    char value[80];
+    char value[BUFFER_LEN];
     int out[2];
     // config
     struct config *cfg;
