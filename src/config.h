@@ -5,7 +5,8 @@
 #include "blocks.h"
 
 struct config cfg[] = {
-    { battery, " %s | ", "BAT0", 5, 0 },
+    { wifi, "%s ", "wlan0", 5, 0 },
+    { battery, "%s ", "BAT0", 5, 0 },
     { datetime, " %s ", "%d.%m.", 5, 0 },
     { datetime, " %s", "%H:%M", 5, 0 },
 };

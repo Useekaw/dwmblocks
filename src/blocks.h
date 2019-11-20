@@ -3,5 +3,6 @@
 
 const int datetime(char *buffer, const char *arg);
 const int battery(char *buffer, const char *bat);
+const int wifi(char *buffer, const char *interface);
 
 #endif
