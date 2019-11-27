@@ -17,6 +17,7 @@ CC = gcc
 SRC = bar.c block.c main.c util.c sys.c
 COM =\
 	 blocks/battery.c\
+	 blocks/arch_updates.c\
 	 blocks/datetime.c\
 	 blocks/wifi.c
 OBJ = ${SRC:.c=.o} ${COM:.c=.o}

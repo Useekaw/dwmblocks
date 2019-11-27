@@ -5,6 +5,7 @@
 #include "blocks.h"
 
 struct config cfg[] = {
+    { checkupdates, "UPDATES: %s ", "%s", 600, 0},
     { wifi, "%s ", "wlan0", 5, 0 },
     { battery, "%s ", "BAT0", 5, 0 },
     { datetime, " %s ", "%d.%m.", 5, 0 },
