@@ -14,7 +14,7 @@ block_t *block_create(bar_t *bar, config_t *cfg, block_t *next) {
         return NULL;
 
     block->ts = 0;
-    block->value[0] = '\n';
+    block->value[0] = '\0';
 
     block->cfg = cfg;
     block->next = next;
@@ -35,7 +35,7 @@ static int block_execute(char *buffer, block_t *block) {
 }
 
 static int block_child(block_t *block) {
-    char buffer[100];
+    char buffer[BUFFER_LEN];
     int err;
 
     close(block->out[0]);
@@ -51,21 +51,33 @@ static int block_child(block_t *block) {
 }
 
 static int block_parent(block_t *block) {
+    // child will not read anything
+    close(block->out[1]);
     return 0;
 }
 
 int block_finish(block_t *block) {
-    char buffer[100];
+    char buffer[BUFFER_LEN];
     
-    read(block->out[0], buffer, 100);
-    snprintf(block->bar->status, sizeof(block->bar->status), block->cfg->fmt, buffer);
+    read(block->out[0], buffer, BUFFER_LEN);
+    snprintf(block->value, BUFFER_LEN, "%s", buffer);
     block->pid = 0;
+
+    close(block->out[0]);
 
     return 0;
 }
 
-static int block_fork(block_t *block) {
+static int block_run_async(block_t *block) {
     int err;
+
+    // check if block is already running/forked
+    if (block->pid > 0)
+        return 0;
+
+    err = sys_pipe(block->out);
+    if (err)
+        return err;
 
     err = sys_fork(&block->pid);
     if (err)
@@ -82,6 +94,7 @@ static int block_fork(block_t *block) {
 
     return block_parent(block);
 }
+
 
 static int block_run_sync(block_t *block) {
     int err;
@@ -114,25 +127,16 @@ static void block_touch(block_t *block) {
 int block_run(block_t *block) {
     int err;
 
-    err = block_run_sync(block);
+    if (block->cfg->async) 
+        err = block_run_async(block);
+    else
+        err = block_run_sync(block);
+        
     if (err)
         return err;
 
     block_touch(block);
 
     return 0;
-
-    if (block->pid > 0) {
-        // TODO: proper error handling
-        return -1;
-    }
-
-    err = sys_pipe(block->out);
-    if (err)
-        return err;
-    
-    return block_fork(block);
-    
-    // return block_run(block);
 }
 

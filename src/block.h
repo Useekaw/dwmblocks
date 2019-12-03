@@ -24,6 +24,7 @@ typedef struct config {
     const char *args;
     const unsigned int ival;
     const unsigned int sig;
+    const unsigned int async;
 } config_t;
 
 block_t *block_create(struct bar *bar, config_t *cfg, block_t *next);

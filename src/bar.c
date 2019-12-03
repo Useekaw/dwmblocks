@@ -66,6 +66,12 @@ static int bar_setup(bar_t *bar) {
     if (err)
         return err;
 
+    for (int i = SIGRTMIN; i <= SIGRTMAX; i++) {
+        err = sys_sigaddset(set, i);
+        if (err)
+            return err;
+    }
+
     // block signals we are interested in
     err = sys_sigsetmask(set);
     if (err)
@@ -130,12 +136,24 @@ static void bar_childsignaled(bar_t *bar) {
     return;
 }
 
+static void bar_sigrt(bar_t *bar, int sig) {
+    block_t *block = bar->blocks;
+
+    while (block) {
+        if (block->cfg->sig != sig)
+            continue;
+        // found targeted block -> handling signal
+        block_run(block);
+    }
+}
+
 static void bar_draw(bar_t *bar) {
     block_t *block = bar->blocks;
     int len = 0;
 
     while (block) {
-        len += snprintf(bar->status + len, 1024 - len, block->cfg->fmt, block->value);
+        if (strlen(block->value) > 0 && block->value[0] != '\0')
+            len += snprintf(bar->status + len, 1024 - len, block->cfg->fmt, block->value);
 
         block = block->next;
     }
@@ -174,6 +192,11 @@ static int bar_run(bar_t *bar) {
 
         if (sig == SIGCHLD) {
             bar_childsignaled(bar);
+            continue;
+        }
+
+        if (sig >= SIGRTMIN && sig <= SIGRTMAX) {
+            bar_sigrt(bar, sig - SIGRTMIN);
             continue;
         }
     }
