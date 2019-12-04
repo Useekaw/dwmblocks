@@ -9,12 +9,12 @@ SRCPATH=./src
 OBJPATH=./obj
 BINPATH=./bin
 
-CFLAGS =  -pedantic -Wall -Os
+CFLAGS =  -pedantic -Wall -Os -DLOG_USE_COLOR
 LDLIBS = -lX11 -lrt
 
 CC = gcc
 
-SRC = bar.c block.c main.c util.c sys.c
+SRC = bar.c block.c main.c util.c sys.c includes/log/src/log.c
 COM =\
 	 blocks/battery.c\
 	 blocks/arch_updates.c\

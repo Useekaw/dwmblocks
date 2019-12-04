@@ -3,6 +3,7 @@
 #include "config.h"
 #include "util.h"
 #include "sys.h"
+#include "includes/log/src/log.h"
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -205,6 +206,8 @@ static int bar_run(bar_t *bar) {
 }
 
 int bar_init() {
+    log_debug("bar_init");
+
     bar_t *bar;
 
     dpy = XOpenDisplay(NULL);

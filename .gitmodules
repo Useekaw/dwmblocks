@@ -1,0 +1,4 @@
+[submodule "src/includes/log"]
+	path = src/includes/log
+    url = https://github.com/rxi/log.c
+    ignore = dirty
