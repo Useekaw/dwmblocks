@@ -1,9 +1,9 @@
 #include "bar.h"
 #include "block.h"
 #include "config.h"
+#include "log.h"
 #include "util.h"
 #include "sys.h"
-#include "includes/log/src/log.h"
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +42,9 @@ static void bar_destroy(bar_t *bar) {
 static int bar_setup(bar_t *bar) {
     sigset_t *set = &bar->sigset;
     timer_t *timerid = &bar->timerid;
+    block_t *block = bar->blocks;
     int err;
+    int ival = 0;
 
     err = sys_sigemptyset(set);
     if (err)
@@ -83,9 +85,20 @@ static int bar_setup(bar_t *bar) {
     if (err)
          return err;
 
-    err = sys_settimer(timerid, 1);
-    if (err)
-        return err;
+    while (block) {
+        if (block->cfg->ival > 0) {
+            ival = gcd(block->cfg->ival, ival);
+        }
+        block = block->next;
+    }
+
+    debug("timer interval will be %d", ival);
+
+    if (ival > 0) {
+        err = sys_settimer(timerid, ival);
+        if (err)
+            return err;
+    }
     
     return 0;
 }
@@ -141,10 +154,12 @@ static void bar_sigrt(bar_t *bar, int sig) {
     block_t *block = bar->blocks;
 
     while (block) {
-        if (block->cfg->sig != sig)
-            continue;
-        // found targeted block -> handling signal
-        block_run(block);
+        if (block->cfg->sig == sig) {
+            // found targeted block -> handling signal
+            block_run(block);
+            break;
+        }
+        block = block->next;
     }
 }
 
@@ -187,6 +202,7 @@ static int bar_run(bar_t *bar) {
             break;
 
         if (sig == SIGALRM) {
+            debug("signal received: SIGALRM");
             bar_timerexpired(bar);
             continue;
         }
@@ -197,6 +213,7 @@ static int bar_run(bar_t *bar) {
         }
 
         if (sig >= SIGRTMIN && sig <= SIGRTMAX) {
+            debug("signal received: SIGRTMIN+%d", sig - SIGRTMIN);
             bar_sigrt(bar, sig - SIGRTMIN);
             continue;
         }

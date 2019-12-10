@@ -33,7 +33,7 @@ options:
 .c.o:
 	${CC} -o $@ -c ${CFLAGS} $<
 
-${OBJ}: config.h blocks.h util.h	
+${OBJ}: config.h blocks.h log.h util.h	
 
 dwmblocks: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDLIBS}

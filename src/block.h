@@ -19,6 +19,7 @@ typedef struct block {
 } block_t;
 
 typedef struct config {
+    const char *name;
     const int (*func)(char *, const char *);
     const char *fmt;
     const char *args;

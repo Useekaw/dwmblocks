@@ -8,5 +8,6 @@
 
 const int util_snprintf(char *str, size_t size, const char *fmt, ...);
 int pscanf(const char *path, const char *fmt, ...);
+int gcd(int a, int b);
 
 #endif

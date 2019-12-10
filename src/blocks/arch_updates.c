@@ -1,3 +1,4 @@
+#include "../log.h"
 #include "../util.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +30,7 @@ static void waitforpacman() {
 
     pid = pacmanpid();
     while (pid) {
+        debug("waiting for pacman [%d]", pid);
         sleep(5);
         pid = pacmanpid();
     }

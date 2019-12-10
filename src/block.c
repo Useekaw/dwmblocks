@@ -1,5 +1,6 @@
 #include "bar.h"
 #include "block.h"
+#include "log.h"
 #include "sys.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,11 +70,14 @@ int block_finish(block_t *block) {
 }
 
 static int block_run_async(block_t *block) {
+    trace("block_run_async: %s", block->cfg->name);
     int err;
 
     // check if block is already running/forked
-    if (block->pid > 0)
+    if (block->pid > 0) {
+        debug("block '%s' already running [%d]", block->cfg->name, block->pid);
         return 0;
+    }
 
     err = sys_pipe(block->out);
     if (err)
@@ -97,6 +101,7 @@ static int block_run_async(block_t *block) {
 
 
 static int block_run_sync(block_t *block) {
+    trace("block_run_sync: %s", block->cfg->name);
     int err;
 
     err = block_execute(block->value, block);
