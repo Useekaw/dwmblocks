@@ -12,6 +12,6 @@ typedef struct bar {
     timer_t timerid;
 } bar_t;
 
-int bar_init();
+int bar_init(config_t cfg[], int cfglen);
 
 #endif

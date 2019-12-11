@@ -1,6 +1,5 @@
 #include "bar.h"
 #include "block.h"
-#include "config.h"
 #include "log.h"
 #include "util.h"
 #include "sys.h"
@@ -15,7 +14,7 @@
 
 static Display *dpy;
 
-static bar_t *bar_create() {
+static bar_t *bar_create(config_t cfg[], int cfglen) {
     bar_t *bar;
     block_t *block;
     int i;
@@ -25,7 +24,7 @@ static bar_t *bar_create() {
         return NULL;
 
     block = NULL;
-    for (i = LEN(cfg) - 1; i >= 0; i--) {
+    for (i = cfglen - 1; i >= 0; i--) {
         block = block_create(bar, &cfg[i], block);
     }
     bar->blocks = block;
@@ -222,7 +221,7 @@ static int bar_run(bar_t *bar) {
     return 0;
 }
 
-int bar_init() {
+int bar_init(config_t cfg[], int cfglen) {
     log_debug("bar_init");
 
     bar_t *bar;
@@ -231,7 +230,7 @@ int bar_init() {
     if (!dpy)
         return -1;
 
-    bar = bar_create();
+    bar = bar_create(cfg, cfglen);
     if (!bar)
         return -1;
 
