@@ -24,7 +24,6 @@ typedef struct config {
     const char *fmt;
     const char *args;
     const unsigned int ival;
-    const unsigned int sig;
     const unsigned int async;
 } config_t;
 

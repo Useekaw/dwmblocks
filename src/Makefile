@@ -10,7 +10,7 @@ OBJPATH=./obj
 BINPATH=./bin
 
 CFLAGS =  -pedantic -Wall -Os -DLOG_USE_COLOR
-LDLIBS = -lX11 -lrt
+LDLIBS = -lX11 -lrt -lasound -lm
 
 CC = gcc
 
@@ -19,7 +19,8 @@ COM =\
 	 blocks/battery.c\
 	 blocks/arch_updates.c\
 	 blocks/datetime.c\
-	 blocks/wifi.c
+	 blocks/wifi.c\
+	 blocks/volume.c
 OBJ = ${SRC:.c=.o} ${COM:.c=.o}
 
 all: options dwmblocks 

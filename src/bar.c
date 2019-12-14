@@ -151,14 +151,16 @@ static void bar_childsignaled(bar_t *bar) {
 
 static void bar_sigrt(bar_t *bar, int sig) {
     block_t *block = bar->blocks;
+    int i = 1;
 
     while (block) {
-        if (block->cfg->sig == sig) {
+        if (i == sig) {
             // found targeted block -> handling signal
             block_run(block);
             break;
         }
         block = block->next;
+        i++;
     }
 }
 

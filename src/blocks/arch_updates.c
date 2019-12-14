@@ -61,7 +61,7 @@ const int checkupdates(char *buffer, const char *fmt) {
         return -1;
     }
 
-    util_snprintf(buffer, BUFFER_LEN, fmt, buf);
+    util_snprintf(buffer, BUFFER_LEN, " %s", buf);
 
     return 0;
 }
