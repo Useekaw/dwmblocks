@@ -6,6 +6,7 @@
 
 struct config cfg[] = {
     { "sysupdate", checkupdates, "%s ", "%s", 3600, 1 },
+    { "cpuperc", cpu_perc, "%s ", NULL, 1 },
     { "volume", volume, "%s ", "%s", 0, 0 },
     { "wifi", wifi, "%s ", "wlo1", 60, 0 },
     { "battery", battery, "%s ", "BAT0", 60, 0 },
