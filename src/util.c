@@ -1,4 +1,6 @@
+#include "util.h"
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 
 const int util_snprintf(char *str, size_t size, const char *fmt, ...) {
@@ -45,4 +47,33 @@ int gcd(int a, int b) {
         return gcd(b, a % b);
     else
         return a;
+}
+
+const int fmt_human(char *buffer, size_t bufferlen, uintmax_t num, int base) {
+    double scaled;
+    size_t i, prefixlen;
+    const char **prefix;
+    const char *prefix_1000[] = { "", "k", "M", "G", "T", "P", "E", "Z", "Y" };
+    const char *prefix_1024[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi" };
+
+    switch (base) {
+        case 1000:
+            prefix = prefix_1000;
+            prefixlen = LEN(prefix_1000);
+            break;
+        case 1024:
+            prefix = prefix_1024;
+            prefixlen = LEN(prefix_1024);
+            break;
+        default:
+            // TODO: proper error handling;
+            return -1;
+    }
+
+    scaled = num;
+    for (i = 0; i < prefixlen && scaled >= base; i++) {
+        scaled /= base;
+    }
+
+    return util_snprintf(buffer, bufferlen, "%.1f %s", scaled, prefix[i]);
 }

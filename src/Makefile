@@ -21,7 +21,8 @@ COM =\
 	 blocks/datetime.c\
 	 blocks/wifi.c\
 	 blocks/volume.c\
-	 blocks/cpu.c
+	 blocks/cpu.c\
+	 blocks/ram.c
 OBJ = ${SRC:.c=.o} ${COM:.c=.o}
 
 all: options dwmblocks 
