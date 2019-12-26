@@ -29,7 +29,7 @@ OBJ = ${SRC:.c=.o} ${COM:.c=.o}
 all: options dwmblocks 
 
 options:
-	@echo yadsbar build options:
+	@echo dwmblocks build options:
 	@echo "CFLAGS = ${CFLAGS}"
 	@echo "LDLIBS = ${LDLIBS}"
 	@echo "CC     = ${CC}"
@@ -44,6 +44,17 @@ dwmblocks: ${OBJ}
 
 clean:
 	rm -f dwmblocks ${OBJ}
+
+install: all
+	mkdir -p ${DESTDIR}${PREFIX}/bin
+	cp -f dwmblocks ${DESTDIR}${PREFIX}/bin
+	chmod 755 ${DESTDIR}${PREFIX}/bin/dwmblocks
+	cp -f dwmblocks_sig_volume ${DESTDIR}${PREFIX}/bin
+	chmod 775 ${DESTDIR}${PREFIX}/bin/dwmblocks_sig_volume
+
+uninstall:
+	rm -f ${DESTDIR}${PREFIX}/bin/dwmblocks\
+		${DESTDIR}${PREFIX}/bin/dwmblocks_sig_volume
 
 #REQ = util
 
