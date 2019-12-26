@@ -22,7 +22,8 @@ COM =\
 	 blocks/wifi.c\
 	 blocks/volume.c\
 	 blocks/cpu.c\
-	 blocks/ram.c
+	 blocks/ram.c\
+	 blocks/netspeeds.c
 OBJ = ${SRC:.c=.o} ${COM:.c=.o}
 
 all: options dwmblocks 

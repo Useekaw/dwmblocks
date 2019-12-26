@@ -9,9 +9,9 @@ const int ram(char *buffer, const char *fmt) {
         return -1;
      
     len += util_snprintf(buffer + len, BUFFER_LEN - len, " ");
-    len += fmt_human(buffer + len, BUFFER_LEN - len, info.totalram - info.freeram, 1024);
+    len += fmt_human(buffer + len, BUFFER_LEN - len, info.totalram - info.freeram, 1000);
     len += util_snprintf(buffer + len, BUFFER_LEN - len, "/");
-    len += fmt_human(buffer+len, BUFFER_LEN - len, info.totalram, 1024);
+    len += fmt_human(buffer+len, BUFFER_LEN - len, info.totalram, 1000);
 
     return 0;
 }
